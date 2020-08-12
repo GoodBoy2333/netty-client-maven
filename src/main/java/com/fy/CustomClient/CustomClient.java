@@ -41,7 +41,9 @@ public class CustomClient {
                                     .addLast(new ProtobufDecoder(CustomMessageData.MessageData.getDefaultInstance()))
                                     .addLast(new ProtobufVarint32LengthFieldPrepender())
                                     .addLast(new ProtobufEncoder())
+                                    // 消息处理
                                     .addLast(new CustomClientHandler())
+                                    // 心跳响应
                                     .addLast(new CustomClientHeartBeatHandler());
                         }
                     });
@@ -51,6 +53,7 @@ public class CustomClient {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            // 短线重连 定时5秒
             group.execute(() -> {
                 try {
                     TimeUnit.MILLISECONDS.sleep(5);

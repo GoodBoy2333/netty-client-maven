@@ -25,6 +25,7 @@ public class CustomClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomMessageData.MessageData messageData = (CustomMessageData.MessageData) msg;
         if (messageData.getOrder() == CustomMessageData.MessageData.DataType.RSP_LOGIN) {
+            // 登录成功后保持心跳 间隔为5秒
             heartbeatFuture = ctx.executor().scheduleAtFixedRate(() -> {
                 CustomMessageData.MessageData req = CustomMessageData.MessageData.newBuilder()
                         .setOrder(CustomMessageData.MessageData.DataType.PING).build();
@@ -41,6 +42,7 @@ public class CustomClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        // 发生异常就取消心跳保持
         if (heartbeatFuture != null) {
             heartbeatFuture.cancel(true);
             heartbeatFuture = null;
